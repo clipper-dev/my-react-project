@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import TodoList from "./components/TodoList";
 
 function App() {
@@ -7,11 +7,11 @@ function App() {
 
   useEffect(() => {
     const storedTodos = JSON.parse(localStorage.getItem("todos"));
-    if (storedTodos) {
+    if(storedTodos) {
       setTodos(storedTodos);
     }
   }, []);
-  
+
   function addTodo(e) {
     e.preventDefault();
     if (addTodoRef.current.value === "") return;
@@ -20,10 +20,16 @@ function App() {
       completed: false,
       title: addTodoRef.current.value,
     };
-    updateList([...todos, todo]);
+    const newTodos = [...todos, todo];
+    updateList(newTodos);
+    console.log(newTodos);
+    /* reset the input field */
     addTodoRef.current.value = "";
     addTodoRef.current.focus();
-    console.log("🚀 ~ file: App.jsx:17 ~ App ~ todos:", todos);
+  }
+  function clearCompleted() {
+    const newTodos = todos.filter((todo) => !todo.completed);
+    updateList(newTodos);
   }
   function updateTodo(id) {
     const newTodos = todos.map((todo) => {
@@ -34,38 +40,36 @@ function App() {
     });
     updateList(newTodos);
   }
-  function clearCompleted() {
-    const newTodos = todos.filter((todo) => !todo.completed);
-    updateList(newTodos);
-  }
-  function updateList(newTodos){
+  function updateList(newTodos) {
     setTodos(newTodos);
     localStorage.setItem("todos", JSON.stringify(newTodos));
   }
   return (
     <main className="flex flex-col gap-4 w-full items-center p-4">
-      <h1 className="font-bold text-4xl">Things to do</h1>
+      <h1 className="font-bold text-6xl">Things to do!</h1>
       <form className="flex gap-4">
         <input
           className="border-2 border-gray-300 p-2 rounded-md"
           type="text"
           placeholder="What to do?"
-          ref={addTodoRef}
           autoFocus
+          ref={addTodoRef}
         />
         <button
           className="bg-blue-500 text-white px-5 py-2 rounded-md"
           type="submit"
-          onClick={addTodo}
+          onClick={(e) => addTodo(e)}
         >
           Add
         </button>
         <button
           className="bg-red-500 text-white px-5 py-2 rounded-md"
-          onClick={() => clearCompleted()}
           type="button"
+          onClick={() => {
+            clearCompleted();
+          }}
         >
-          Clear
+          Clear done
         </button>
       </form>
       <TodoList todos={todos} updateList={updateTodo} />
